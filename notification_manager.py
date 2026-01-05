@@ -29,9 +29,9 @@ class NotificationManager:
         message = self.client.messages.create(
             from_=os.environ["TWILIO_VIRTUAL_NUMBER"],
             body=message_body,
-            to=os.environ["TWILIO_VIRTUAL_NUMBER"]
+            to=os.environ["TWILIO_VERIFIED_NUMBER"] # Kendi numaranıza gönderin / Send to your own verified number
         )
-        # Prints if successfully sent.
+        # Mesaj SID'sini yazdır (başarılıysa) / Print SID if successful
         print(message.sid)
 
     # Is SMS not working for you or prefer whatsapp? Connect to the WhatsApp Sandbox!

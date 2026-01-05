@@ -22,10 +22,12 @@ ORIGIN_CITY_IATA = os.environ.get("ORIGIN_CITY_IATA", "LON")
 
 # ==================== Update the Airport Codes in Google Sheet ====================
 
+# Her satır için IATA kodunu kontrol et / Check IATA code for each row
 for row in sheet_data:
     if row["iataCode"] == "":
+        # Eğer kod eksikse Amadeus API üzerinden bul / If code is missing, find it via Amadeus API
         row["iataCode"] = flight_search.get_destination_code(row["city"])
-        # slowing down requests to avoid rate limit
+        # API limitlerine takılmamak için kısa bir bekleme / Small delay to avoid API rate limits
         time.sleep(2)
 print(f"sheet_data:\n {sheet_data}")
 
@@ -37,7 +39,7 @@ tomorrow = datetime.now() + timedelta(days=1)
 six_month_from_today = datetime.now() + timedelta(days=(6 * 30))
 
 for destination in sheet_data:
-    print(f"Getting flights for {destination}")
+    print(f"Uçuşlar aranıyor / Getting flights for {destination}")
     flights = flight_search.check_flights(
         ORIGIN_CITY_IATA,
         destination["iataCode"],

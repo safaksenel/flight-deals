@@ -25,7 +25,7 @@ class FlightSearch:
         """
         self._api_key = os.environ["AMADEUS_API_KEY"]
         self._api_secret = os.environ["AMADEUS_SECRET"]
-        # Getting a new token every time program is run. Could reuse unexpired tokens as an extension.
+        # Her çalışma için yeni bir token al / Get a new token for every execution
         self._token = self._get_new_token()
 
     def _get_new_token(self):
@@ -48,7 +48,7 @@ class FlightSearch:
         }
         response = requests.post(url=TOKEN_ENDPOINT, headers=header, data=body)
 
-        # New bearer token. Typically expires in 1799 seconds (30min)
+        # Yeni token yazdır / Print new token details
         print(f"Your token is {response.json()['access_token']}")
         print(f"Your token expires in {response.json()['expires_in']} seconds")
         return response.json()['access_token']

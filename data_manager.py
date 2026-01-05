@@ -11,15 +11,17 @@ SHEETY_PRICES_ENDPOINT = os.environ["SHEETY_PRICES_ENDPOINT"]
 class DataManager:
 
     def __init__(self):
+        # Ortam değişkenlerinden kimlik bilgilerini al / Get credentials from environment variables
         self._user = os.environ["SHEETY_USERNAME"]
         self._password = os.environ["SHEETY_PASSWORD"]
         self._authorization = HTTPBasicAuth(self._user, self._password)
         self.destination_data = {}
 
     def get_destination_data(self):
+        # Sheety API'den tüm verileri çek / Fetch all data from Sheety API
         response = requests.get(
             url=SHEETY_PRICES_ENDPOINT,
-            auth=self._authorization  # 👈 KRİTİK SATIR
+            auth=self._authorization
         )
         response.raise_for_status()
         data = response.json()
