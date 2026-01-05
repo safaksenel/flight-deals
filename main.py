@@ -22,15 +22,16 @@ ORIGIN_CITY_IATA = os.environ.get("ORIGIN_CITY_IATA", "LON")
 
 # ==================== Update the Airport Codes in Google Sheet ====================
 
-# Her satır için IATA kodunu kontrol et / Check IATA code for each row
+# Check IATA code for each row
 for row in sheet_data:
     if row["iataCode"] == "":
-        # Eğer kod eksikse Amadeus API üzerinden bul / If code is missing, find it via Amadeus API
+        # Find missing IATA codes via Amadeus API
         row["iataCode"] = flight_search.get_destination_code(row["city"])
-        # API limitlerine takılmamak için kısa bir bekleme / Small delay to avoid API rate limits
+        # Small delay to avoid API rate limits
         time.sleep(2)
 print(f"sheet_data:\n {sheet_data}")
 
+# Push updated codes back to Google Sheet
 data_manager.destination_data = sheet_data
 data_manager.update_destination_codes()
 
@@ -39,7 +40,7 @@ tomorrow = datetime.now() + timedelta(days=1)
 six_month_from_today = datetime.now() + timedelta(days=(6 * 30))
 
 for destination in sheet_data:
-    print(f"Uçuşlar aranıyor / Getting flights for {destination}")
+    print(f"Getting flights for {destination}")
     flights = flight_search.check_flights(
         ORIGIN_CITY_IATA,
         destination["iataCode"],
@@ -47,14 +48,12 @@ for destination in sheet_data:
         to_time=six_month_from_today
     )
     cheapest_flight = find_cheapest_flight(flights)
+    
+    # Send alert if price is lower than threshold
     if cheapest_flight.price != "N/A" and cheapest_flight.price < destination["lowestPrice"]:
         print(f"Lower price flight found to {destination['city']}!")
-        # notification_manager.send_sms(
-        #     message_body=f"Low price alert! Only £{cheapest_flight.price} to fly "
-        #                  f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
-        #                  f"on {cheapest_flight.out_date} until {cheapest_flight.return_date}."
-        # )
-        # SMS not working? Try whatsapp instead.
+        
+        # Send notification via WhatsApp
         notification_manager.send_whatsapp(
             message_body=f"Low price alert! Only £{cheapest_flight.price} to fly "
                          f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
